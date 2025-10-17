@@ -1,4 +1,7 @@
 [core]
-    remote = local
+    remote = gdrive
 ['remote "local"']
     url = ../../dvc-storage
+['remote "gdrive"']
+    url = gdrive://DVC_lab8
+    gdrive_use_service_account = false
