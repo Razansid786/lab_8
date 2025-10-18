@@ -1,0 +1,38 @@
+﻿stages:
+  prepare_data:
+    cmd: python src/prepare_data.py
+    deps:
+      - data/zameen_updated.csv
+      - src/prepare_data.py
+    params:
+      - data
+    outs:
+      - data/processed/cleaned_data.csv
+
+  feature_engineering:
+    cmd: python src/feature_engineering.py
+    deps:
+      - data/processed/cleaned_data.csv
+      - src/feature_engineering.py
+    params:
+      - features
+    outs:
+      - data/processed/features.csv
+      - data/processed/target.csv
+      - models/preprocessors
+
+  train:
+    cmd: python src/train.py
+    deps:
+      - data/processed/features.csv
+      - data/processed/target.csv
+      - src/train.py
+    params:
+      - model
+      - hyperparameters
+      - training
+    outs:
+      - models/house_price_model.pkl
+    metrics:
+      - metrics.json:
+          cache: false

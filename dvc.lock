@@ -1,0 +1,95 @@
+schema: '2.0'
+stages:
+  prepare_data:
+    cmd: python src/prepare_data.py
+    deps:
+    - path: data/zameen_updated.csv
+      hash: md5
+      md5: 862ce971c086da8903e8ecc7c8a52c92
+      size: 49522076
+    - path: src/prepare_data.py
+      hash: md5
+      md5: 2af26aa5e5a33e4495cc13c60316d122
+      size: 932
+    params:
+      params.yaml:
+        data:
+          test_size: 0.2
+          random_state: 42
+    outs:
+    - path: data/processed/cleaned_data.csv
+      hash: md5
+      md5: 47c583e497cfc892aeae6cd31746028b
+      size: 37894995
+  feature_engineering:
+    cmd: python src/feature_engineering.py
+    deps:
+    - path: data/processed/cleaned_data.csv
+      hash: md5
+      md5: 47c583e497cfc892aeae6cd31746028b
+      size: 37894995
+    - path: src/feature_engineering.py
+      hash: md5
+      md5: 14379306a0499a66ee245a250b63d5c3
+      size: 1878
+    params:
+      params.yaml:
+        features:
+          numerical:
+          - property_size
+          - bedrooms
+          - bathrooms
+          categorical:
+          - location
+          - property_type
+    outs:
+    - path: data/processed/features.csv
+      hash: md5
+      md5: 14734b8c51c098f869df7ff8db180766
+      size: 46368889
+    - path: data/processed/target.csv
+      hash: md5
+      md5: 72f4c87c8ba63554b2af56517c0f88e0
+      size: 1121596
+    - path: models/preprocessors
+      hash: md5
+      md5: 1bed1ca2bc40d70bef0802939ce0c5db.dir
+      size: 16750161
+      nfiles: 2
+  train:
+    cmd: python src/train.py
+    deps:
+    - path: data/processed/features.csv
+      hash: md5
+      md5: 14734b8c51c098f869df7ff8db180766
+      size: 46368889
+    - path: data/processed/target.csv
+      hash: md5
+      md5: 72f4c87c8ba63554b2af56517c0f88e0
+      size: 1121596
+    - path: src/train.py
+      hash: md5
+      md5: 5386b839ffdacfad446bd3db44f125ad
+      size: 3725
+    params:
+      params.yaml:
+        hyperparameters:
+          n_estimators: 100
+          max_depth: 10
+          min_samples_split: 5
+          min_samples_leaf: 2
+        model:
+          type: RandomForestRegressor
+          random_state: 42
+        training:
+          save_model_path: models/house_price_model.pkl
+          metrics_path: metrics.json
+    outs:
+    - path: metrics.json
+      hash: md5
+      md5: f191308a11b52c297059a1f6eca396c4
+      size: 262
+    - path: models/house_price_model.pkl
+      hash: md5
+      md5: 7ebee590ae25e78e92bea27b554c9b0c
+      size: 9911361
